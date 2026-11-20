@@ -75,4 +75,29 @@ public class EjemplarDAO {
             }
         }
     }
+
+    public static int contarPrestamos(Connection con, String bn, int nroEjemplar) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM PRESTAMO WHERE ISBN = ? AND nro_ejemplar = ?";
+        try (PreparedStatement ps = con.prepareStatement(sql))
+        {
+            ps.setString(1, bn);
+            ps.setInt(2, nroEjemplar);
+            try (ResultSet rs = ps.executeQuery()) {
+                rs.next();
+                return rs.getInt(1);
+            }
+
+        }
+    }
+    
+    public static void eliminar(Connection con, String bn, int nroEjemplar) throws SQLException {
+        String sql= "DELETE FROM EJEMPLAR WHERE ISBN = ? AND nro_ejemplar = ?";
+                try (PreparedStatement ps = con.prepareStatement(sql))
+        {
+            ps.setString(1, bn);
+            ps.setInt(2, nroEjemplar);
+            ps.executeUpdate();
+
+        }
+    }
 }

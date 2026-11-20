@@ -17,6 +17,7 @@ public class MenuEjemplar {
             System.out.println("--- GESTIÓN DE EJEMPLARES ---");
             System.out.println("1. Agregar ejemplar");
             System.out.println("2. Listar ejemplares de un libro");
+            System.out.println("3. Eliminar ejemplar");
             System.out.println("0. Volver");
             op = Entrada.leerOpcion("Seleccione una opción: ");
             try {
@@ -25,6 +26,8 @@ public class MenuEjemplar {
                         agregarEjemplar(con);
                     case 2 ->
                         listarEjemplares(con);
+                    case 3 ->
+                        eliminarEjemplar(con);
                     case 0 -> {}
                     default ->
                         System.out.println("Opción inválida.");
@@ -103,4 +106,44 @@ public class MenuEjemplar {
         }
     }
     */
+
+    private static void eliminarEjemplar(Connection con) throws SQLException
+    {
+      String isbn= Entrada.leerISBN("ISBN del libro: ");
+      Libro libroEncontrado=LibroDAO.buscar(con,isbn);
+      if(libroEncontrado==null)
+      {
+          System.out.println("No se encontró un libro con ese ISBN.");
+      }
+      else
+      {
+          int nroEjemplar=Entrada.leerEnteroPositivo("Numero de ejemplar a eliminar: ");
+          Ejemplar e= EjemplarDAO.buscar(con, isbn, nroEjemplar);
+          if(e==null)
+          {
+              System.out.println("No existe un ejemplar con ese numero.");
+          }
+          else
+          {
+              int prestamos=EjemplarDAO.contarPrestamos(con,isbn,nroEjemplar);
+              if (prestamos>0)
+              {
+                  System.out.println("No se puede eliminar el ejemplar"+nroEjemplar+"ya que tiene prestamos registrados");
+              }
+              else
+              {
+                  if (Entrada.confirmar("Está seguro de que quiere eliminar el ejemplar "+nroEjemplar+"? (S/N)"))
+                  {
+                     EjemplarDAO.eliminar(con,isbn,nroEjemplar);
+                  }
+                  else
+                  {
+                      System.out.println("Operación cancelada");
+                  }
+              }
+          }
+      }
+      
+      
+    }
 }
